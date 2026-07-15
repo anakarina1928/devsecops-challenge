@@ -1,0 +1,6 @@
+apiVersion: v2
+name: microservicio
+description: Helm chart para el microservicio de tareas del reto DevSecOps de Mibanco
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
