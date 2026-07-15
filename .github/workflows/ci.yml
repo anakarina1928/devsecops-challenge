@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, "release/**", main]
+  push:
+    branches: [develop, "release/**", main, "hotfix/**"]
+
+jobs:
+  build-test:
+    uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/reusable-build-test.yml@main
+
+  docker-build:
+    needs: build-test
+    uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/reusable-docker-build.yml@main
+    with:
+      registry: devsecopschallenge2026.azurecr.io
+      image-name: microservicio
+      image-tag: ${{ github.sha }}
+      environment: dev
+    secrets: inherit
+
+  security-scan:
+    needs: docker-build
+    uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/reusable-security-scan.yml@main
+    with:
+      image-ref: ${{ needs.docker-build.outputs.full-image-ref }}
