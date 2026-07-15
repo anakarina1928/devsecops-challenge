@@ -1,0 +1,60 @@
+# Valores por defecto del chart. El pipeline de CD sobreescribe
+# image.repository, image.tag y environment con --set en tiempo de despliegue.
+
+replicaCount: 1
+
+image:
+  repository: devsecopschallenge2026.azurecr.io/microservicio
+  tag: latest
+  pullPolicy: IfNotPresent
+
+environment: dev
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  host: microservicio.devsecops-challenge.local
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Mínimo privilegio a nivel de contenedor (requisito del reto)
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+probes:
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 15
+    periodSeconds: 5
+
+# Variables de entorno no sensibles. Los secretos van vía Vault
+# (ver actions/vault-secrets-inject en el repo shared-workflows),
+# nunca se declaran valores sensibles aqui.
+env: []
+  # - name: EXAMPLE_VAR
+  #   value: "example"
