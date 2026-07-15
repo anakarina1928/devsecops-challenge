@@ -30,3 +30,5 @@ jobs:
     uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/reusable-security-scan.yml@main
     with:
       image-ref: ${{ needs.docker-build.outputs.full-image-ref }}
+      environment: dev
+    secrets: inherit
