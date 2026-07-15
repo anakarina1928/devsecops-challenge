@@ -6,6 +6,11 @@ on:
   push:
     branches: [develop, "release/**", main, "hotfix/**"]
 
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
 jobs:
   build-test:
     uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/reusable-build-test.yml@main
