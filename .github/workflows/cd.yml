@@ -1,0 +1,66 @@
+name: CD
+
+# Un solo workflow con dos formas de disparo:
+# 1) workflow_run: automatico, cuando CI termina bien en develop o release/* -> despliega a dev/qa.
+# 2) workflow_dispatch: manual, para desplegar a produccion. Quien lo dispara indica
+#    el tag de imagen (SHA) que ya paso por CI y quiere promover. Ademas del disparo
+#    manual, el job "deploy" corre bajo el Environment "prod", que tiene un revisor
+#    requerido configurado en GitHub: el pipeline queda pausado hasta su aprobacion.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [develop, "release/**"]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Tag de la imagen a desplegar en prod (SHA del commit en main/hotfix que ya paso CI)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  determine-environment:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set.outputs.environment }}
+      namespace: ${{ steps.set.outputs.namespace }}
+      image-tag: ${{ steps.set.outputs.image-tag }}
+    steps:
+      - id: set
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Disparo manual -> siempre es una promocion a produccion
+            echo "environment=prod" >> "$GITHUB_OUTPUT"
+            echo "namespace=prod" >> "$GITHUB_OUTPUT"
+            echo "image-tag=${{ inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            # Disparo automatico tras un CI exitoso -> dev o qa segun la rama
+            REF="${{ github.event.workflow_run.head_branch }}"
+            SHA="${{ github.event.workflow_run.head_sha }}"
+            echo "image-tag=$SHA" >> "$GITHUB_OUTPUT"
+            if [[ "$REF" == release/* ]]; then
+              echo "environment=qa" >> "$GITHUB_OUTPUT"
+              echo "namespace=qa" >> "$GITHUB_OUTPUT"
+            else
+              echo "environment=dev" >> "$GITHUB_OUTPUT"
+              echo "namespace=dev" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+  deploy:
+    needs: determine-environment
+    uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/reusable-deploy-aks.yml@main
+    with:
+      environment: ${{ needs.determine-environment.outputs.environment }}
+      namespace: ${{ needs.determine-environment.outputs.namespace }}
+      image-ref: devsecopschallenge2026.azurecr.io/microservicio:${{ needs.determine-environment.outputs.image-tag }}
+      resource-group: rg-devsecops-challenge
+      aks-cluster-name: aks-devsecops-challenge-ana
+    secrets: inherit

@@ -1,7 +1,7 @@
-@'
+cat > .gitignore << 'EOF'
 target/
 *.class
 .idea/
 *.iml
 .vscode/
-'@ | Out-File -Encoding utf8 .gitignore
+EOF

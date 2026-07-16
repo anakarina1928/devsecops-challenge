@@ -1,0 +1,17 @@
+El microservicio "{{ .Release.Name }}" fue desplegado en el namespace "{{ .Release.Namespace }}" (ambiente: {{ .Values.environment }}).
+
+Para verificar el estado de los pods:
+  kubectl get pods -n {{ .Release.Namespace }} -l app={{ .Release.Name }}
+
+Para ver los logs:
+  kubectl logs -n {{ .Release.Namespace }} -l app={{ .Release.Name }} -f
+
+{{- if .Values.ingress.enabled }}
+
+La aplicacion deberia quedar accesible en:
+  http://{{ .Values.ingress.host }}{{ .Values.ingress.path }}
+
+Prueba rapida:
+  curl http://{{ .Values.ingress.host }}/hello
+  curl http://{{ .Values.ingress.host }}/actuator/health
+{{- end }}
