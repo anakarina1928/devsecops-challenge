@@ -8,6 +8,10 @@ public class HelloController {
 
     @GetMapping("/hello")
     public String hello() {
-        return "Hola desde el microservicio DevSecOps Challenge - Mibanco";
+        String secreto = System.getenv("GREETING_SECRET");
+        if (secreto == null || secreto.isBlank()) {
+            secreto = "no-configurado";
+        }
+        return "Hola, el secreto alojado es: " + secreto;
     }
 }
