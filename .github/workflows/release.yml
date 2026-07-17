@@ -1,4 +1,4 @@
-name: "Release - Pipeline hacia ambiente qa"
+name: "Release"
 
 on:
   push:
