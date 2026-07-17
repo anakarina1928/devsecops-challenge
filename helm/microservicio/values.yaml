@@ -52,9 +52,13 @@ probes:
     initialDelaySeconds: 15
     periodSeconds: 5
 
-# Variables de entorno no sensibles. Los secretos van vía Vault
-# (ver actions/vault-secrets-inject en el repo shared-workflows),
-# nunca se declaran valores sensibles aqui.
+# Variables de entorno no sensibles.
 env: []
   # - name: EXAMPLE_VAR
   #   value: "example"
+
+# Secreto obtenido de Azure Key Vault en tiempo de despliegue (ver pipeline).
+# El pipeline lo sobreescribe con --set-string secretValue=... ; nunca se
+# escribe el valor real aqui en el chart.
+secretValue: ""
+

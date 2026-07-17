@@ -53,6 +53,11 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.environment }}
+            - name: GREETING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-greeting-secret
+                  key: greeting
             {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
