@@ -1,7 +1,10 @@
-name: "Develop - Pipeline hacia ambiente dev"
+name: "Develop"
 
 on:
   push:
+    branches: [develop]
+  
+  pull_request:
     branches: [develop]
 
 permissions:
