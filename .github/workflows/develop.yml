@@ -1,0 +1,19 @@
+name: "Develop - Pipeline hacia ambiente dev"
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  pipeline:
+    name: "Ejecutando el pipeline completo hacia dev"
+    uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/template-orchestrator.yml@main
+    with:
+      environment: dev
+      namespace: dev
+      registry: devsecopschallenge2026.azurecr.io
+      image-name: microservicio
+      image-tag: ${{ github.sha }}
+      resource-group: rg-devsecops-challenge
+      aks-cluster-name: aks-devsecops-challenge-ana
+    secrets: inherit
