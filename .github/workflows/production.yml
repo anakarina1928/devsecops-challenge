@@ -1,0 +1,24 @@
+name: "Production - Ejecución manual a ambiente prod"
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Tag de la imagen a promover a prod (SHA del commit que ya paso por qa)"
+        required: true
+        type: string
+
+jobs:
+  pipeline:
+    name: "Promoviendo imagen validada hacia prod"
+    uses: anakarina1928/devsecops-shared-workflows-challenge/.github/workflows/template-orchestrator.yml@main
+    with:
+      environment: prod
+      namespace: prod
+      registry: devsecopschallenge2026.azurecr.io
+      image-name: microservicio
+      image-tag: ${{ inputs.image_tag }}
+      resource-group: rg-devsecops-challenge
+      aks-cluster-name: aks-devsecops-challenge-ana
+      skip-build: true
+    secrets: inherit
