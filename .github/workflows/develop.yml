@@ -1,8 +1,9 @@
-name: "Develop - Pipeline hacia ambiente dev"
+name: "Develop"
 
 on:
   push:
     branches: [develop]
+  
 
 permissions:
   contents: read

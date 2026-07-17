@@ -2,7 +2,6 @@ package com.mibanco.challenge.controller;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HelloControllerTest {
@@ -10,16 +9,18 @@ class HelloControllerTest {
     private final HelloController controller = new HelloController();
 
     @Test
-    void shouldReturnGreetingMessage() {
+    void shouldReturnGreetingWithSecretPlaceholder() {
+        // En el entorno de test no existe la variable de entorno GREETING_SECRET,
+        // por lo que el controlador debe usar el valor por defecto "no-configurado".
         String response = controller.hello();
 
-        assertEquals("Hola desde el microservicio DevSecOps Challenge - Mibanco", response);
+        assertTrue(response.startsWith("Hola, el secreto alojado es: "));
     }
 
     @Test
-    void shouldMentionMibanco() {
+    void shouldFallBackWhenSecretIsMissing() {
         String response = controller.hello();
 
-        assertTrue(response.contains("Mibanco"));
+        assertTrue(response.contains("no-configurado"));
     }
 }

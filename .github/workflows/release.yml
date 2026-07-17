@@ -1,8 +1,9 @@
-name: "Release - Pipeline hacia ambiente qa"
+name: "Release"
 
 on:
   push:
-    branches: ["release/**"]
+    branches: ["release"]
+
 
 permissions:
   contents: read
